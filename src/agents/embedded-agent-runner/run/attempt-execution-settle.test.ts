@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("../logger.js", () => ({
-  log: { debug: mocks.logDebug, error: mocks.logError },
+  embeddedAgentLog: { debug: mocks.logDebug, error: mocks.logError },
 }));
 vi.mock("../../subagents/registry/subagent-registry.js", () => ({
   settleRequesterAfterSessionSpawns: mocks.settleRequesterAfterSessionSpawns,
