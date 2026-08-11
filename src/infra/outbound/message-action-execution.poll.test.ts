@@ -1,23 +1,173 @@
 // Covers message-action poll handling through plugin dispatch and core gateway
 // poll fallback.
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import {
-  clearMessageActionPollMocks,
-  messageActionRunnerMocks as mocks,
-  pollerConfig,
-  pollerTestPlugin,
-  resetMessageActionPollMocks,
-  runPollAction,
-} from "./message-action-runner.test-helpers.js";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { ChannelPlugin } from "../../channels/plugins/types.public.js";
+import type { OpenClawConfig } from "../../config/config.js";
+import { getActivePluginRegistry, setActivePluginRegistry } from "../../plugins/runtime.js";
+import { createTestRegistry } from "../../test-utils/channel-plugins.js";
+import type { MessageActionInput } from "./message-action-contracts.js";
+
+const mocks = vi.hoisted(() => ({
+  executePollAction: vi.fn<typeof import("./outbound-send-service.js").executePollAction>(),
+  resolveOutboundChannelPlugin:
+    vi.fn<typeof import("./channel-resolution.js").resolveOutboundChannelPlugin>(),
+}));
+
+vi.mock("./channel-resolution.js", () => ({
+  normalizeDeliverableOutboundChannel: (value?: string | null) =>
+    typeof value === "string" ? value.trim().toLowerCase() || undefined : undefined,
+  resolveOutboundChannelPlugin: mocks.resolveOutboundChannelPlugin,
+  resetOutboundChannelResolutionStateForTest: vi.fn(),
+}));
+
+vi.mock("./outbound-send-service.js", () => ({
+  executeSendAction: vi.fn(async () => {
+    throw new Error("executeSendAction should not run in poll tests");
+  }),
+  executePollAction: mocks.executePollAction,
+}));
+
+vi.mock("./outbound-session.js", () => ({
+  ensureOutboundSessionEntry: vi.fn(async () => undefined),
+  resolveOutboundSessionRoute: vi.fn(async () => null),
+}));
+
+vi.mock("./message-action-threading.js", async () => {
+  const { createOutboundThreadingMock } =
+    await import("./message-action-threading.test-helpers.js");
+  return createOutboundThreadingMock();
+});
+
+// Vitest hoists the mocks above this static import, so this module owns one
+// stable poll runner graph even when the surrounding shard shares its cache.
+import { runMessageAction } from "./message-action-runner.js";
+
+const pollerConfig = {
+  channels: {
+    poller: {
+      botToken: "poller-test",
+    },
+  },
+} as OpenClawConfig;
+
+const pollerTestPlugin: ChannelPlugin = {
+  id: "poller",
+  meta: {
+    id: "poller",
+    label: "Poller",
+    selectionLabel: "Poller",
+    docsPath: "/channels/poller",
+    blurb: "Poller test plugin.",
+  },
+  capabilities: { chatTypes: ["direct", "group"] },
+  config: {
+    listAccountIds: () => ["default"],
+    resolveAccount: () => ({ botToken: "poller-test" }),
+    isConfigured: () => true,
+  },
+  outbound: {
+    deliveryMode: "gateway",
+    sendPoll: async () => ({
+      messageId: "poll-test",
+    }),
+  },
+  messaging: {
+    targetResolver: {
+      looksLikeId: () => true,
+      resolveTarget: async ({ normalized }) => ({
+        to: normalized,
+        kind: "user",
+        source: "normalized",
+      }),
+    },
+  },
+  threading: {
+    resolveAutoThreadId: ({ toolContext, to, replyToId }) => {
+      if (replyToId) {
+        return undefined;
+      }
+      if (toolContext?.currentChannelId !== to) {
+        return undefined;
+      }
+      return toolContext.currentThreadTs;
+    },
+  },
+};
+
+async function runPollAction(params: {
+  cfg: OpenClawConfig;
+  actionParams: Record<string, unknown>;
+  toolContext?: MessageActionInput["toolContext"];
+  inboundEventKind?: MessageActionInput["inboundEventKind"];
+}) {
+  await runMessageAction({
+    cfg: params.cfg,
+    action: "poll",
+    params: params.actionParams,
+    toolContext: params.toolContext,
+    inboundEventKind: params.inboundEventKind,
+  });
+  const call = mocks.executePollAction.mock.calls[0]?.[0];
+  if (!call) {
+    throw new Error("expected executePollAction call");
+  }
+  return {
+    ...call.resolveCorePoll?.(),
+    ctx: call.ctx,
+  };
+}
 
 describe("runMessageAction poll handling", () => {
   beforeEach(() => {
-    resetMessageActionPollMocks();
+    setActivePluginRegistry(
+      createTestRegistry([{ pluginId: "poller", source: "test", plugin: pollerTestPlugin }]),
+    );
+    mocks.resolveOutboundChannelPlugin.mockReset();
+    mocks.resolveOutboundChannelPlugin.mockImplementation(
+      ({ channel }: { channel: string }) =>
+        getActivePluginRegistry()?.channels.find((entry) => entry?.plugin?.id === channel)?.plugin,
+    );
+    mocks.executePollAction.mockReset();
+    mocks.executePollAction.mockImplementation(async (input) => {
+      const corePoll = input.resolveCorePoll();
+      const pollResult = {
+        channel: input.ctx.channel,
+        to: corePoll.to,
+        question: corePoll.question,
+        options: corePoll.options,
+        maxSelections: corePoll.maxSelections,
+        durationSeconds: corePoll.durationSeconds ?? null,
+        durationHours: corePoll.durationHours ?? null,
+        via: "gateway" as const,
+      };
+      return {
+        handledBy: "core",
+        payload: pollResult,
+        pollResult,
+      };
+    });
   });
 
   afterEach(() => {
-    clearMessageActionPollMocks();
+    setActivePluginRegistry(createTestRegistry([]));
+    mocks.executePollAction.mockReset();
   });
+
+  it("requires at least two poll options", async () => {
+    await expect(
+      runPollAction({
+        cfg: pollerConfig,
+        actionParams: {
+          channel: "poller",
+          target: "poller:123",
+          pollQuestion: "Lunch?",
+          pollOption: ["Pizza"],
+        },
+      }),
+    ).rejects.toThrow(/pollOption requires at least two values/i);
+    expect(mocks.executePollAction).toHaveBeenCalledTimes(1);
+  });
+
   it("passes shared poll fields and auto threadId to executePollAction", async () => {
     const call = await runPollAction({
       cfg: pollerConfig,
@@ -34,10 +184,10 @@ describe("runMessageAction poll handling", () => {
       },
     });
 
-    expect(call?.durationHours).toBe(2);
-    expect(call?.threadId).toBe("42");
-    expect(call?.ctx?.params?.threadId).toBe("42");
-    expect(call?.ctx?.plugin).toBe(pollerTestPlugin);
+    expect(call.durationHours).toBe(2);
+    expect(call.threadId).toBe("42");
+    expect(call.ctx.params.threadId).toBe("42");
+    expect(call.ctx.plugin).toBe(pollerTestPlugin);
     expect(mocks.resolveOutboundChannelPlugin).toHaveBeenCalledTimes(1);
   });
 
@@ -71,7 +221,7 @@ describe("runMessageAction poll handling", () => {
       inboundEventKind: "room_event",
     });
 
-    expect(call?.ctx?.inboundEventKind).toBe("room_event");
+    expect(call.ctx.inboundEventKind).toBe("room_event");
   });
 
   it("copies the normalized idempotency key into poll execution context", async () => {
@@ -86,7 +236,7 @@ describe("runMessageAction poll handling", () => {
       },
     });
 
-    expect(call?.ctx?.idempotencyKey).toBe("run-1:message-tool:poll-1:fingerprint");
+    expect(call.ctx.idempotencyKey).toBe("run-1:message-tool:poll-1:fingerprint");
   });
 
   it("expands maxSelections when pollMulti is enabled", async () => {
@@ -101,7 +251,7 @@ describe("runMessageAction poll handling", () => {
       },
     });
 
-    expect(call?.maxSelections).toBe(3);
+    expect(call.maxSelections).toBe(3);
   });
 
   it("defaults maxSelections to one choice when pollMulti is omitted", async () => {
@@ -115,6 +265,6 @@ describe("runMessageAction poll handling", () => {
       },
     });
 
-    expect(call?.maxSelections).toBe(1);
+    expect(call.maxSelections).toBe(1);
   });
 });
