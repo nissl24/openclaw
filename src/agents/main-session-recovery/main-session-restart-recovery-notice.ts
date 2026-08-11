@@ -15,7 +15,7 @@ import { buildUnresumableSessionNoticeIdempotencyKey } from "./main-session-rest
 import { resolveRestartRecoveryDeliveryContext } from "./main-session-restart-dispatch.js";
 import {
   buildRestartRecoveryExpectedState,
-  log,
+  mainSessionRecoveryLog,
   UNRESUMABLE_SESSION_NOTICE,
 } from "./main-session-restart-recovery-shared.js";
 
@@ -38,11 +38,11 @@ export async function sendUnresumableSessionNotice(params: {
 
   try {
     await params.gatewayRuntime.sendRecoveryNotice(notice);
-    log.info(
+    mainSessionRecoveryLog.info(
       `sent interrupted main session recovery notice: ${params.sessionKey} (${params.reason})`,
     );
   } catch (err) {
-    log.warn(
+    mainSessionRecoveryLog.warn(
       `failed to send interrupted main session recovery notice ${params.sessionKey}: ${String(err)}`,
     );
   }
@@ -69,7 +69,7 @@ export async function writeUnresumableSessionNotice(params: {
     idempotencyKey: buildUnresumableSessionNoticeIdempotencyKey(params.entry),
   }).catch((error: unknown) => ({ ok: false as const, reason: String(error) }));
   if (!result.ok) {
-    log.warn(
+    mainSessionRecoveryLog.warn(
       `failed to write interrupted main session notice ${params.sessionKey}: ${result.reason}`,
     );
   }
@@ -120,7 +120,9 @@ export async function failUnresumableMainSession(params: {
   if (marked.transition.kind !== "failed") {
     return "skipped";
   }
-  log.warn(`marked interrupted main session failed: ${params.sessionKey} (${params.reason})`);
+  mainSessionRecoveryLog.warn(
+    `marked interrupted main session failed: ${params.sessionKey} (${params.reason})`,
+  );
   if (deliveryContext) {
     await sendUnresumableSessionNotice({
       deliveryContext,

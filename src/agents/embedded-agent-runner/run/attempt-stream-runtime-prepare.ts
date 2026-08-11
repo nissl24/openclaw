@@ -3,7 +3,7 @@ import {
   bindOwnedSessionTranscriptWrites,
   withOwnedSessionTranscriptWrites,
 } from "../../../config/sessions/transcript-write-context.js";
-import { log } from "../logger.js";
+import { embeddedAgentLog } from "../logger.js";
 import type { EmbeddedAgentQueueHandle } from "../runs.js";
 import { flushPendingToolResultsAfterIdle } from "../wait-for-idle-before-flush.js";
 import { abortable as abortableWithSignal } from "./abortable.js";
@@ -118,7 +118,7 @@ export async function prepareEmbeddedAttemptStreamRuntime(input: {
     attempt,
     getQueueHandle: () => queueHandleRef.current,
     isProbeSession,
-    log,
+    log: embeddedAgentLog,
     runAbortController: input.runAbortController,
     state: input.abortState,
   });

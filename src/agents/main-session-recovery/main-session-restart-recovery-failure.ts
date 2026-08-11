@@ -12,7 +12,7 @@ import {
 } from "./main-session-restart-recovery-notice.js";
 import {
   buildRestartRecoveryExpectedState,
-  log,
+  mainSessionRecoveryLog,
   MAX_RECOVERY_RETRIES,
 } from "./main-session-restart-recovery-shared.js";
 
@@ -39,7 +39,9 @@ async function claimMainRestartRecoveryTombstone(params: {
   if (claim.transition.kind !== "tombstoned" || !claim.entry) {
     return null;
   }
-  log.warn(`tombstoned main-session restart recovery: ${params.sessionKey} (${params.reason})`);
+  mainSessionRecoveryLog.warn(
+    `tombstoned main-session restart recovery: ${params.sessionKey} (${params.reason})`,
+  );
   return claim.entry;
 }
 

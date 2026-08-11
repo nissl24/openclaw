@@ -49,7 +49,7 @@ import {
   type ExhaustedRestartRecoveryTarget,
   type ExpectedRestartRecoveryTarget,
   hasCurrentProcessOwner,
-  log,
+  mainSessionRecoveryLog,
   MAX_RECOVERY_RETRIES,
   normalizeStringSet,
 } from "./main-session-restart-recovery-shared.js";
@@ -116,7 +116,9 @@ function resolveRecoveryDispatchSessionKey(params: {
       ? target.canonicalKey
       : undefined;
   } catch (err) {
-    log.warn(`failed to resolve recovery store for ${params.sessionKey}: ${String(err)}`);
+    mainSessionRecoveryLog.warn(
+      `failed to resolve recovery store for ${params.sessionKey}: ${String(err)}`,
+    );
     return undefined;
   }
 }
@@ -184,7 +186,7 @@ export async function recoverStore(params: {
       entries = listSessionEntriesByStatus({ storePath: params.storePath }, ["running"]);
     }
   } catch (err) {
-    log.warn(`failed to load session store ${params.storePath}: ${String(err)}`);
+    mainSessionRecoveryLog.warn(`failed to load session store ${params.storePath}: ${String(err)}`);
     result.failed++;
     return result;
   }
@@ -462,7 +464,7 @@ export async function recoverStore(params: {
         return result;
       }
       if (entry.pendingFinalDelivery?.kind === "replayable") {
-        log.warn(
+        mainSessionRecoveryLog.warn(
           `transcript unavailable for ${sessionKey}; resuming its durable pending final delivery`,
         );
         await resumeCurrent({
@@ -470,7 +472,7 @@ export async function recoverStore(params: {
         });
         continue;
       }
-      log.warn(`failed to read transcript for ${sessionKey}: ${String(err)}`);
+      mainSessionRecoveryLog.warn(`failed to read transcript for ${sessionKey}: ${String(err)}`);
       result.failed++;
       continue;
     }

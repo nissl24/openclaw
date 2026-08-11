@@ -1,5 +1,5 @@
 /** Settles the provider stream and completes the post-turn lifecycle phase. */
-import { log } from "../logger.js";
+import { embeddedAgentLog } from "../logger.js";
 import { joinWithRunLivenessDeadline, RUN_LIVENESS_JOIN_TIMEOUT_MS } from "./abortable.js";
 import { completeEmbeddedAttemptAfterTurn } from "./attempt-finalize.js";
 import { settleEmbeddedAttemptStream } from "./attempt-stream-settle.js";
@@ -54,7 +54,7 @@ export async function finalizeEmbeddedAttemptStreamPhase(input: {
     joinWork: input.waitForPendingEvents,
     runAbortSignal: input.settle.runAbortSignal,
     onTimeout: () => {
-      log.warn(
+      embeddedAgentLog.warn(
         `pending subscription events did not settle within ${RUN_LIVENESS_JOIN_TIMEOUT_MS}ms; ` +
           `proceeding to stream settlement: runId=${input.attempt.runId}`,
       );
