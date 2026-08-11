@@ -1,74 +1,11 @@
 [
   {
-    "name": "agentCommand",
-    "files": [
-      "src/agents/agent-command.ts",
-      "src/gateway/test-helpers.runtime-state.ts"
-    ]
-  },
-  {
-    "name": "applyExclusiveSlotSelection",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/slots.ts"
-    ]
-  },
-  {
-    "name": "applyFinalEffectiveToolPolicy",
-    "files": [
-      "src/agents/embedded-agent-runner/effective-tool-policy.ts",
-      "src/gateway/server-methods/__mocks__/tools-effective.runtime.ts"
-    ]
-  },
-  {
-    "name": "applyPluginUninstallDirectoryRemoval",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/uninstall.ts"
-    ]
-  },
-  {
     "name": "authorizeConfigWrite",
     "files": [
       "src/channels/plugins/config-writes.ts",
       "src/plugin-sdk/channel-config-helpers.ts"
     ],
     "sdk": true
-  },
-  {
-    "name": "buildBundleMcpToolsFromCatalog",
-    "files": [
-      "src/agents/agent-bundle-mcp-materialize.ts",
-      "src/gateway/server-methods/__mocks__/tools-effective.runtime.ts"
-    ]
-  },
-  {
-    "name": "buildPluginDiagnosticsReport",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/status.ts"
-    ]
-  },
-  {
-    "name": "buildPluginInspectReport",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/status.ts"
-    ]
-  },
-  {
-    "name": "buildPluginRegistrySnapshotReport",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/status-snapshot.ts"
-    ]
-  },
-  {
-    "name": "buildPluginSnapshotReport",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/status.ts"
-    ]
   },
   {
     "name": "buildQaTarget",
@@ -87,40 +24,12 @@
     "sdk": true
   },
   {
-    "name": "callGateway",
-    "files": [
-      "src/cli/program.test-mocks.ts",
-      "src/gateway/call.ts"
-    ]
-  },
-  {
-    "name": "callGatewayCli",
-    "files": [
-      "src/cli/nodes-cli/rpc.ts",
-      "src/gateway/call.ts"
-    ]
-  },
-  {
     "name": "canBypassConfigWritePolicy",
     "files": [
       "src/channels/plugins/config-writes.ts",
       "src/plugin-sdk/channel-config-helpers.ts"
     ],
     "sdk": true
-  },
-  {
-    "name": "classifySessionKind",
-    "files": [
-      "src/agents/tools/sessions-helpers.ts",
-      "src/sessions/classify-session-kind.ts"
-    ]
-  },
-  {
-    "name": "clearPluginRegistryLoadCache",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/loader-cache.ts"
-    ]
   },
   {
     "name": "clearSecretsRuntimeSnapshot",
@@ -146,13 +55,6 @@
     "sdk": true
   },
   {
-    "name": "containsConfigIncludeDirective",
-    "files": [
-      "src/config/io.read-helpers.ts",
-      "src/plugins/install-persistence.ts"
-    ]
-  },
-  {
     "name": "createFixedWindowRateLimiter",
     "files": [
       "src/infra/fixed-window-rate-limit.ts",
@@ -161,24 +63,10 @@
     "sdk": true
   },
   {
-    "name": "createGatewayStartupTrace",
-    "files": [
-      "src/cli/startup-trace.ts",
-      "src/gateway/server-startup-trace.ts"
-    ]
-  },
-  {
     "name": "createPluginLoaderLogger",
     "files": [
       "src/plugins/loader-shared.ts",
       "src/plugins/logger.ts"
-    ]
-  },
-  {
-    "name": "createSuiteTempRootTracker",
-    "files": [
-      "src/plugins/test-helpers/fs-fixtures.ts",
-      "src/test-helpers/temp-dir.ts"
     ]
   },
   {
@@ -222,13 +110,6 @@
     "sdk": true
   },
   {
-    "name": "doctorCommand",
-    "files": [
-      "src/commands/doctor.ts",
-      "src/flows/doctor-health.ts"
-    ]
-  },
-  {
     "name": "drainPendingDeliveries",
     "files": [
       "src/infra/outbound/delivery-queue-recovery.ts",
@@ -254,20 +135,6 @@
     "sdk": true
   },
   {
-    "name": "extractAssistantVisibleText",
-    "files": [
-      "src/agents/embedded-agent-utils.ts",
-      "src/shared/chat-message-content.ts"
-    ]
-  },
-  {
-    "name": "extractMessageText",
-    "files": [
-      "src/auto-reply/reply/commands-subagents-text.ts",
-      "src/gateway/session-transcript-readers.ts"
-    ]
-  },
-  {
     "name": "fileExists",
     "files": [
       "src/infra/state-migrations.fs.ts",
@@ -275,13 +142,6 @@
       "src/plugin-sdk/security-runtime.ts"
     ],
     "sdk": true
-  },
-  {
-    "name": "formatConfigPath",
-    "files": [
-      "src/commands/doctor-config-analysis.ts",
-      "src/config/logging.ts"
-    ]
   },
   {
     "name": "formatConfigWriteDeniedMessage",
@@ -324,33 +184,12 @@
     "sdk": true
   },
   {
-    "name": "getActivePluginChannelRegistryVersion",
-    "files": [
-      "src/gateway/server-methods/__mocks__/tools-effective.runtime.ts",
-      "src/plugins/runtime.ts"
-    ]
-  },
-  {
-    "name": "getActivePluginRegistryVersion",
-    "files": [
-      "src/gateway/server-methods/__mocks__/tools-effective.runtime.ts",
-      "src/plugins/runtime.ts"
-    ]
-  },
-  {
     "name": "getChatChannelMeta",
     "files": [
       "src/channels/chat-meta.ts",
       "src/plugin-sdk/core.ts"
     ],
     "sdk": true
-  },
-  {
-    "name": "getFreePort",
-    "files": [
-      "src/gateway/test-helpers.server.ts",
-      "src/test-utils/ports.ts"
-    ]
   },
   {
     "name": "getReplyFromConfig",
@@ -385,76 +224,6 @@
     "sdk": true
   },
   {
-    "name": "inspectPluginRegistry",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/plugin-registry-snapshot.ts"
-    ]
-  },
-  {
-    "name": "inspectPortUsage",
-    "files": [
-      "src/daemon/test-helpers/schtasks-fixtures.ts",
-      "src/infra/ports-inspect.ts"
-    ]
-  },
-  {
-    "name": "installHooksFromNpmSpec",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/hooks/install.ts"
-    ]
-  },
-  {
-    "name": "installHooksFromPath",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/hooks/install.ts"
-    ]
-  },
-  {
-    "name": "installPluginFromClawHub",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/clawhub.ts"
-    ]
-  },
-  {
-    "name": "installPluginFromGitSpec",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/git-install.ts"
-    ]
-  },
-  {
-    "name": "installPluginFromMarketplace",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/marketplace.ts"
-    ]
-  },
-  {
-    "name": "installPluginFromNpmPackArchive",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/install-npm-pack.ts"
-    ]
-  },
-  {
-    "name": "installPluginFromNpmSpec",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/install-npm.ts"
-    ]
-  },
-  {
-    "name": "installPluginFromPath",
-    "files": [
-      "src/cli/plugins-cli-test-helpers.ts",
-      "src/plugins/install-package.ts"
-    ]
-  },
-  {
     "name": "isClaudeCliProvider",
     "files": [
       "src/agents/cli-runner/helpers.ts",
@@ -477,20 +246,6 @@
       "src/plugin-sdk/qa-runtime.ts"
     ],
     "sdk": true
-  },
-  {
-    "name": "killProcessTree",
-    "files": [
-      "src/agents/shell-utils.ts",
-      "src/daemon/test-helpers/schtasks-fixtures.ts"
-    ]
-  },
-  {
-    "name": "listManagedPluginNpmRoots",
-    "files": [
-      "src/commands/doctor-plugin-host-links.ts",
-      "src/plugins/npm-project-roots.ts"
-    ]
   },
   {
     "name": "listMemoryEmbeddingProviders",
@@ -549,13 +304,6 @@
     "sdk": true
   },
   {
-    "name": "loadGatewayTlsRuntime",
-    "files": [
-      "src/gateway/server/tls.ts",
-      "src/infra/tls/gateway.ts"
-    ]
-  },
-  {
     "name": "loadJsonFile",
     "files": [
       "src/infra/json-file.ts",
@@ -604,23 +352,6 @@
     "sdk": true
   },
   {
-    "name": "log",
-    "files": [
-      "src/agents/auth-profiles/constants.ts",
-      "src/agents/embedded-agent-runner/logger.ts",
-      "src/agents/main-session-recovery/main-session-restart-recovery-shared.ts",
-      "src/system-agent/setup-inference-core.ts",
-      "src/tasks/task-registry-state.ts"
-    ]
-  },
-  {
-    "name": "makeTempDir",
-    "files": [
-      "src/infra/exec-approvals-test-helpers.ts",
-      "src/plugins/loader.test-fixtures.ts"
-    ]
-  },
-  {
     "name": "materializeRequesterScopedMcpToolsForHarnessRun",
     "files": [
       "src/agents/agent-bundle-mcp-harness.ts",
@@ -635,13 +366,6 @@
       "src/plugin-sdk/codex-mcp-projection.ts"
     ],
     "sdk": true
-  },
-  {
-    "name": "MAX_TIMER_DELAY_MS",
-    "files": [
-      "src/cron/service/timer-execution-timeout.ts",
-      "src/gateway/probe.ts"
-    ]
   },
   {
     "name": "maybeApplyTtsToPayload",
